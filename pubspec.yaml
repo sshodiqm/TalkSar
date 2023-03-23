@@ -1,0 +1,30 @@
+name: talk_s_a_r
+version: 1.0.0+1
+publish_to: none
+description: A new Flutter project.
+environment: 
+  sdk: '>=2.18.2 <3.0.0'
+
+dependencies: 
+  cupertino_icons: ^1.0.2
+  get: 4.6.5
+  firebase_core: 2.8.0
+  firebase_auth: 4.2.9
+  cloud_firestore: 4.4.3
+  flutter_svg: 2.0.3
+  image_picker: 0.8.7
+  firebase_storage: 11.0.16
+  flutter: 
+    sdk: flutter
+
+dev_dependencies: 
+  flutter_lints: ^2.0.0
+  flutter_test: 
+    sdk: flutter
+
+flutter: 
+  assets: 
+    - assets/svg/
+    - assets/img/
+  uses-material-design: true
+
