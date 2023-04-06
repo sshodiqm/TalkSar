@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talk_s_a_r/app/controllers/auth_controller.dart';
+import '../../../../res/theme.dart';
 import '../../../../widget/list_kritik_riwayat.dart';
 import '../controllers/history_controller.dart';
 
 class HistoryView extends GetView<HistoryController> {
   final authC = Get.find<AuthController>();
-
-  List<Tab> myTab = [
+  final List<Tab> myTab = [
     Tab(
       text: "Terbaru",
     ),
@@ -16,7 +16,6 @@ class HistoryView extends GetView<HistoryController> {
       text: "Terlama",
     ),
   ];
-
   @override
   Widget build(BuildContext context) {
     Get.put(HistoryController());
@@ -25,8 +24,12 @@ class HistoryView extends GetView<HistoryController> {
         length: myTab.length,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('HISTORY'),
-            centerTitle: true,
+            iconTheme: IconThemeData(color: Colors.black),
+            backgroundColor: Colors.white,
+            title: Text(
+              'Riwayat',
+              style: TextStyle(color: Colors.black),
+            ),
             actions: [
               IconButton(
                 onPressed: () => authC.logout(),
@@ -34,11 +37,18 @@ class HistoryView extends GetView<HistoryController> {
               )
             ],
             bottom: TabBar(
+              labelColor: greenSAR,
+              unselectedLabelColor: greySAR,
+              indicator: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: greenSAR,
+                  ),
+                ),
+              ),
               tabs: myTab,
             ),
           ),
-
-          // FOR REALTIME GET DATA FROM DB
           body: TabBarView(
             children: [
               StreamBuilder<QuerySnapshot<Object?>>(
@@ -56,6 +66,7 @@ class HistoryView extends GetView<HistoryController> {
                 stream: controller.streamData(isDescending: false),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.active) {
+                    // var listAllDocs = snapshot.data?.docs ?? [];
                     var listAllDocs = snapshot.data!.docs;
                     return ListKritikRiwayat(
                         listAllDocs: listAllDocs, controller: controller);
@@ -63,6 +74,18 @@ class HistoryView extends GetView<HistoryController> {
                   return Center(child: CircularProgressIndicator());
                 },
               ),
+              // StreamBuilder<QuerySnapshot<Object?>>(
+              //   stream: controller.streamData(isDescending: false),
+              //   builder: (context, snapshot) {
+              //     if (snapshot.connectionState == ConnectionState.active &&
+              //         snapshot.data != null) {
+              //       var listAllDocs = snapshot.data!.docs;
+              //       return ListKritikRiwayat(
+              //           listAllDocs: listAllDocs, controller: controller);
+              //     }
+              //     return Center(child: CircularProgressIndicator());
+              //   },
+              // ),
             ],
           ),
         ),

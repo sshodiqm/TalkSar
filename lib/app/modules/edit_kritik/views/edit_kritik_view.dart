@@ -14,23 +14,21 @@ class EditKritikView extends StatefulWidget {
 }
 
 class _EditKritikViewState extends State<EditKritikView> {
-  final controller = Get.put(EditKritikController());
   final picker = ImagePicker();
   File? _image;
 
-  @override
-  void initState() {
-    super.initState();
-    var args = Get.arguments;
-    if (args != null) {
+  Future<void> _getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       setState(() {
-        _image = File(args["gambar"]);
+        _image = File(pickedFile.path);
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(EditKritikController());
     return Scaffold(
       appBar: AppBar(
         title: Text('EDIT KRITIK'),
@@ -43,13 +41,14 @@ class _EditKritikViewState extends State<EditKritikView> {
             var data = snapshot.data!.data() as Map<String, dynamic>;
             controller.judulC.text = data["judul"];
             controller.kategoriC.text = data["kategori"];
+            controller.deskripsiC.text = data["deskripsi"];
             return Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   Card(
                     child: InkWell(
-                      onTap: initState,
+                      onTap: _getImageFromGallery,
                       child: Container(
                         width: double.infinity,
                         height: 200,
@@ -59,7 +58,10 @@ class _EditKritikViewState extends State<EditKritikView> {
                                 fit: BoxFit.cover,
                               )
                             : Center(
-                                child: Text("Tambahkan gambar"),
+                                child: Text(
+                                  "Ganti gambar",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
                       ),
                     ),
@@ -75,11 +77,30 @@ class _EditKritikViewState extends State<EditKritikView> {
                   SizedBox(
                     height: 10,
                   ),
-                  TextField(
-                    controller: controller.kategoriC,
-                    textInputAction: TextInputAction.done,
+                  DropdownButtonFormField(
+                    value: controller.kategoriC.text,
+                    items: controller.kategoriList.map((String kategori) {
+                      return DropdownMenuItem<String>(
+                        value: kategori,
+                        child: Text(kategori),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      controller.kategoriC.text = value!;
+                    },
                     decoration: InputDecoration(
                       labelText: "Kategori",
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  TextField(
+                    controller: controller.deskripsiC,
+                    maxLines: 5,
+                    maxLength: 500,
+                    decoration: InputDecoration(
+                      labelText: "Deskripsi Kritik",
+                      hintText: "Tulis deskripsi kritik Anda di sini",
+                      border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 30),
@@ -87,6 +108,8 @@ class _EditKritikViewState extends State<EditKritikView> {
                     onPressed: () => controller.editKritik(
                       controller.judulC.text,
                       controller.kategoriC.text,
+                      controller.deskripsiC.text,
+                      _image!,
                       Get.arguments,
                     ),
                     child: Text("EDIT KRITIK"),
@@ -95,7 +118,9 @@ class _EditKritikViewState extends State<EditKritikView> {
               ),
             );
           }
-          return Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );

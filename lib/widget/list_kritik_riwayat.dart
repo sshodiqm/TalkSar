@@ -17,16 +17,13 @@ class ListKritikRiwayat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("listAllDocs: $listAllDocs");
     return ListView.builder(
       itemCount: listAllDocs.length,
       itemBuilder: (context, index) => ListTile(
         onTap: () => Get.toNamed(
           Routes.EDIT_KRITIK,
-          arguments: {
-            "docID": listAllDocs[index].id,
-            "gambar":
-                (listAllDocs[index].data() as Map<String, dynamic>)["gambar"],
-          },
+          arguments: listAllDocs[index].id,
         ),
         leading: Image.network(
           "${(listAllDocs[index].data() as Map<String, dynamic>)["gambar"]}",

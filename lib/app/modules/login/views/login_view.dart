@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:talk_s_a_r/app/controllers/auth_controller.dart';
 import 'package:talk_s_a_r/app/routes/app_pages.dart';
 
+import '../../../../res/theme.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends StatefulWidget {
@@ -130,13 +131,17 @@ class _LoginViewState extends State<LoginView> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () => Get.toNamed(Routes.RESET_PASSWORD),
-                    child: Text("Reset Password"),
+                    child: Text(
+                      "Reset Password",
+                      style: TextStyle(color: orangeSAR),
+                    ),
                   ),
                 ),
                 SizedBox(
                   height: 50,
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: blueSAR),
                   onPressed: () => _authC.login(_loginController.emailC.text,
                       _loginController.passC.text),
                   child: Text("LOGIN"),
@@ -147,8 +152,12 @@ class _LoginViewState extends State<LoginView> {
                   children: [
                     Text("Belum punya akun?"),
                     TextButton(
-                        onPressed: () => Get.toNamed(Routes.SIGNUP),
-                        child: Text("Daftar Sekarang"))
+                      onPressed: () => Get.toNamed(Routes.SIGNUP),
+                      child: Text(
+                        "Daftar Sekarang",
+                        style: TextStyle(color: orangeSAR),
+                      ),
+                    )
                   ],
                 )
               ],

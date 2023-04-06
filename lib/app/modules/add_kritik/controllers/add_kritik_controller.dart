@@ -8,10 +8,17 @@ import 'package:get/get.dart';
 class AddKritikController extends GetxController {
   late TextEditingController judulC;
   late TextEditingController kategoriC;
+  late TextEditingController deskripsiC;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  void addKritik(String judul, String kategori, File image) async {
+  void addKritik(
+    String judul,
+    String kategori,
+    String deskripsi,
+    File image,
+    String userId,
+  ) async {
     // Inisialisasi Firebase
     await Firebase.initializeApp();
     final storage = FirebaseStorage.instance;
@@ -30,8 +37,10 @@ class AddKritikController extends GetxController {
       await kritik.add({
         "judul": judul,
         "kategori": kategori,
+        "deskripsi": deskripsi,
         "gambar": downloadUrl,
         "createdAt": dateNow,
+        "userId": userId,
       });
 
       // Tampilkan dialog konfirmasi
@@ -41,6 +50,7 @@ class AddKritikController extends GetxController {
         onConfirm: () {
           judulC.clear();
           kategoriC.clear();
+          deskripsiC.clear();
           // gambarC.clear();
           Get.back(); //close dialog
           Get.back(); //back to home
@@ -60,6 +70,7 @@ class AddKritikController extends GetxController {
   void onInit() {
     judulC = TextEditingController();
     kategoriC = TextEditingController();
+    deskripsiC = TextEditingController();
     super.onInit();
   }
 
@@ -67,6 +78,7 @@ class AddKritikController extends GetxController {
   void onClose() {
     judulC.dispose();
     kategoriC.dispose();
+    deskripsiC.dispose();
     super.onClose();
   }
 }

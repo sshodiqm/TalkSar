@@ -5,6 +5,7 @@ import 'package:talk_s_a_r/app/modules/history/views/history_view.dart';
 import 'package:talk_s_a_r/app/modules/home/views/home_view.dart';
 import 'package:talk_s_a_r/app/modules/profile/views/profile_view.dart';
 
+import '../../../../res/theme.dart';
 import '../controllers/main_screen_controller.dart';
 
 class MainScreenView extends StatefulWidget {
@@ -33,6 +34,8 @@ class _MainScreenViewState extends State<MainScreenView> {
     return Scaffold(
       body: showPage[index],
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: blueSAR,
+        unselectedItemColor: greySAR,
         currentIndex: index,
         onTap: (value) {
           setState(() {

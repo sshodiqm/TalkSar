@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:talk_s_a_r/res/theme.dart';
 import '../controllers/add_kritik_controller.dart';
 
 class AddKritikView extends StatefulWidget {
@@ -14,6 +16,32 @@ class _AddKritikViewState extends State<AddKritikView> {
   File? _image;
   final _judulController = TextEditingController();
   final _kategoriController = TextEditingController();
+  final _deskripsiController = TextEditingController();
+  String? _userId;
+
+  List<String> _kategoriList = [
+    'Dosen',
+    'Pegawai',
+    'Fasilitas',
+    'Pelayanan',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _kategoriController.text =
+        _kategoriList[0]; // Atur nilai awal untuk _kategoriController.text
+    _getUserID();
+  }
+
+  Future<void> _getUserID() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        _userId = user.uid;
+      });
+    }
+  }
 
   Future<void> _getImageFromGallery() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -27,7 +55,9 @@ class _AddKritikViewState extends State<AddKritikView> {
   void _addKritik() async {
     if (_judulController.text.isEmpty ||
         _kategoriController.text.isEmpty ||
-        _image == null) {
+        _deskripsiController.text.isEmpty ||
+        _image == null ||
+        _userId == null) {
       Get.snackbar(
         "Terjadi Kesalahan",
         "Pastikan semua field terisi dan gambar sudah dipilih",
@@ -43,7 +73,9 @@ class _AddKritikViewState extends State<AddKritikView> {
       controller.addKritik(
         _judulController.text,
         _kategoriController.text,
+        _deskripsiController.text,
         _image!,
+        _userId!,
       );
     } catch (e) {
       Get.snackbar(
@@ -59,12 +91,17 @@ class _AddKritikViewState extends State<AddKritikView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ADD KRITIK'),
+        iconTheme: IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+        title: Text(
+          'Tulis Kritik',
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: ListView(
           children: [
             Card(
               child: InkWell(
@@ -95,17 +132,41 @@ class _AddKritikViewState extends State<AddKritikView> {
             SizedBox(
               height: 10,
             ),
-            TextField(
-              controller: _kategoriController,
-              textInputAction: TextInputAction.done,
+            DropdownButtonFormField<String>(
+              value: _kategoriController.text,
+              onChanged: (value) {
+                setState(() {
+                  _kategoriController.text = value!;
+                });
+              },
               decoration: InputDecoration(
-                labelText: "Kategori",
+                labelText: 'Kategori',
+              ),
+              items: _kategoriList
+                  .map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  })
+                  .toList()
+                  .toList(),
+            ),
+            TextField(
+              controller: _deskripsiController,
+              maxLines: 5,
+              maxLength: 500,
+              decoration: InputDecoration(
+                labelText: "Deskripsi Kritik",
+                hintText: "Tulis deskripsi kritik Anda di sini",
+                border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 30),
             ElevatedButton(
               onPressed: _addKritik,
               child: Text("ADD KRITIK"),
+              style: ElevatedButton.styleFrom(backgroundColor: blueSAR),
             )
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:talk_s_a_r/app/controllers/auth_controller.dart';
+import 'package:talk_s_a_r/res/theme.dart';
 
 import '../controllers/signup_controller.dart';
 
@@ -32,8 +33,13 @@ class _SignupViewState extends State<SignupView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('SignupView'),
+          iconTheme: IconThemeData(color: Colors.black),
+          title: Text(
+            'SignupView',
+            style: TextStyle(color: Colors.black),
+          ),
           centerTitle: true,
+          backgroundColor: Colors.white,
         ),
         body: SafeArea(
           minimum: EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -71,6 +77,25 @@ class _SignupViewState extends State<SignupView> {
                   ),
                 ),
 
+                //Username
+                Container(
+                  margin: EdgeInsets.only(bottom: 5),
+                  child: Text(
+                    "Username",
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                //input username
+                TextFormField(
+                  controller: _signupController.usernameC,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    labelText: "Username",
+                    contentPadding: EdgeInsets.all(15),
+                  ),
+                ),
                 //Email
                 Container(
                   margin: EdgeInsets.only(bottom: 5),
@@ -148,10 +173,14 @@ class _SignupViewState extends State<SignupView> {
                   height: 50,
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: blueSAR,
+                  ),
                   onPressed: () => _authC.signup(
                     _signupController.emailC.text,
                     _signupController.passC.text,
                     _signupController.confirmPassC.text,
+                    _signupController.usernameC.text,
                   ),
                   child: Text("DAFTAR"),
                 ),
@@ -162,7 +191,10 @@ class _SignupViewState extends State<SignupView> {
                     Text("Sudah punya akun?"),
                     TextButton(
                         onPressed: () => Get.back(),
-                        child: Text("Masuk Sekarang"))
+                        child: Text(
+                          "Masuk Sekarang",
+                          style: TextStyle(color: orangeSAR),
+                        ))
                   ],
                 )
               ],

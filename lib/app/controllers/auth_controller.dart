@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:talk_s_a_r/app/routes/app_pages.dart';
@@ -41,7 +42,7 @@ class AuthController extends GetxController {
         password: password,
       );
       if (myUser.user!.emailVerified) {
-        Get.offAllNamed(Routes.HOME);
+        Get.offAllNamed(Routes.MAIN_SCREEN);
       } else {
         Get.defaultDialog(
           title: "Email Verification",
@@ -77,7 +78,7 @@ class AuthController extends GetxController {
     }
   }
 
-  void signup(String email, String password, String confirm) async {
+  void signup(String email, String password, String confirm, String username) async {
     if (password != confirm) {
       Get.defaultDialog(
         title: "Terjadi Kesalahan",
@@ -91,7 +92,16 @@ class AuthController extends GetxController {
         email: email,
         password: password,
       );
+      await myUser.user!.updateDisplayName(username);
       await myUser.user!.sendEmailVerification();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(myUser.user!.uid)
+          .set({
+        'username': username,
+        'email': email,
+        'password': password,
+      });
       Get.defaultDialog(
         title: "Email Verification",
         middleText: "Kami telah mengirimkan email verifikasi ke $email.",

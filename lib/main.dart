@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:talk_s_a_r/app/controllers/auth_controller.dart';
+import 'package:talk_s_a_r/app/modules/profile/controllers/profile_controller.dart';
 // import 'package:talk_s_a_r/app/modules/home/views/home_view.dart';
 // import 'package:talk_s_a_r/app/modules/login/views/login_view.dart';
 
@@ -19,6 +20,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final authC = Get.put(AuthController(), permanent: true);
+  final profileC = Get.put(ProfileController());
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 class HistoryController extends GetxController {
@@ -10,10 +11,29 @@ class HistoryController extends GetxController {
     return kritik.get();
   }
 
-  Stream<QuerySnapshot<Object?>> streamData({bool isDescending = true}) {
+  Stream<QuerySnapshot<Object?>> streamData(
+      {bool isDescending = true,
+      bool Function(DocumentSnapshot<Object?> doc)? filter}) {
+    final user = FirebaseAuth.instance.currentUser;
     CollectionReference kritik = firestore.collection("kritik");
-    return kritik.orderBy("createdAt", descending: isDescending).snapshots();
+    Query query = kritik.where('userId', isEqualTo: user?.uid);
+    query = query.orderBy("createdAt", descending: isDescending);
+    return query.snapshots();
   }
+
+  // Stream<QuerySnapshot<Object?>> streamData(
+  //     {bool isDescending = true,
+  //     bool Function(DocumentSnapshot<Object?> doc)? filter}) {
+  //   final user = FirebaseAuth.instance.currentUser;
+  //   CollectionReference kritik = firestore.collection("kritik");
+  //   Query query = kritik.where('userId', isEqualTo: user?.uid);
+  //   if (isDescending) {
+  //     query = query.orderBy("createdAt", descending: true);
+  //   } else {
+  //     query = query.orderBy("createdAt", descending: false);
+  //   }
+  //   return query.snapshots();
+  // }
 
   void deleteKritik(String docId) {
     DocumentReference docRef = firestore.collection("kritik").doc(docId);

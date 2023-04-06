@@ -5,8 +5,6 @@ class LoginController extends GetxController {
   TextEditingController emailC = TextEditingController();
   TextEditingController passC = TextEditingController();
 
-  // bool _secureText = true;
-
   @override
   void onClose() {
     emailC.dispose();
