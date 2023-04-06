@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:talk_s_a_r/res/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,8 @@ class ListKritik extends StatefulWidget {
 }
 
 class _ListKritikState extends State<ListKritik> {
+
+  final FirebaseAuth auth = FirebaseAuth.instance;
   // Harus pakai Map bukan List
   final Map<String, bool> _isLiked = new Map();
 
@@ -37,8 +40,12 @@ class _ListKritikState extends State<ListKritik> {
   }
 
   void _restoreLikeStatus(String id) async {
+
     final prefs = await SharedPreferences.getInstance();
-    final isLiked = prefs.getBool('like_$id');
+    final user = await getLogedInUser();
+    String uid =  user.uid;
+
+    final isLiked = prefs.getBool('like_$id\_$uid');
     if (isLiked != null) {
       setState(() {
         _isLiked[id] = isLiked;
@@ -54,13 +61,20 @@ class _ListKritikState extends State<ListKritik> {
 
   Future<void> _saveLikeStatus(String id, bool isLiked) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('like_$id', isLiked);
+    final user = await getLogedInUser();
+    String uid =  user.uid;
+
+    await prefs.setBool('like_$id\_$uid', isLiked);
   }
 
   // Apakah Di Like atau Tidak ?
   bool isLiked(String id) {
     final liked = _isLiked[id];
     return liked == null ? false : liked;
+  }
+
+  Future<User> getLogedInUser() async {
+    return await auth.currentUser!;
   }
 
   @override
