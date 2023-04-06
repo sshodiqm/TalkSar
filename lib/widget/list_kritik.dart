@@ -19,7 +19,8 @@ class ListKritik extends StatefulWidget {
 }
 
 class _ListKritikState extends State<ListKritik> {
-  List<bool> _isLiked = [];
+  // Harus pakai Map bukan List
+  final Map<String, bool> _isLiked = new Map();
 
   // Future<void> _toggleLike(Kritik kritik) async {
   //   await HomeController().toggleLike(kritik);
@@ -29,17 +30,18 @@ class _ListKritikState extends State<ListKritik> {
   void initState() {
     super.initState();
     for (var i = 0; i < widget.listAllDocs.length; i++) {
-      _isLiked.add(false);
-      _restoreLikeStatus(i);
+      final docId = widget.listAllDocs[i].id;
+      _isLiked[docId] = false;
+      _restoreLikeStatus(docId);
     }
   }
 
-  void _restoreLikeStatus(int index) async {
+  void _restoreLikeStatus(String id) async {
     final prefs = await SharedPreferences.getInstance();
-    final isLiked = prefs.getBool('like_$index');
+    final isLiked = prefs.getBool('like_$id');
     if (isLiked != null) {
       setState(() {
-        _isLiked[index] = isLiked;
+        _isLiked[id] = isLiked;
       });
     }
   }
@@ -47,13 +49,18 @@ class _ListKritikState extends State<ListKritik> {
   void _updateLikeCount(int index, bool isLiked) {
     final docId = widget.listAllDocs[index].id;
     final docRef = FirebaseFirestore.instance.collection('kritik').doc(docId);
-    print(docId);
     docRef.update({'like': FieldValue.increment(isLiked ? 1 : -1)});
   }
 
-  Future<void> _saveLikeStatus(int index, bool isLiked) async {
+  Future<void> _saveLikeStatus(String id, bool isLiked) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('like_$index', isLiked);
+    await prefs.setBool('like_$id', isLiked);
+  }
+
+  // Apakah Di Like atau Tidak ?
+  bool isLiked(String id) {
+    final liked = _isLiked[id];
+    return liked == null ? false : liked;
   }
 
   @override
@@ -92,17 +99,17 @@ class _ListKritikState extends State<ListKritik> {
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          _isLiked[index] = !_isLiked[index];
+                          _isLiked[filteredDocs[index].id] = isLiked(filteredDocs[index].id) ? false : true;
                         });
-                        // _toggleLike(filteredDocs[index] as Kritik);
-                        _updateLikeCount(index, _isLiked[index]);
-                        _saveLikeStatus(index, _isLiked[index]);
+
+                        _updateLikeCount(index, isLiked(filteredDocs[index].id));
+                        _saveLikeStatus(filteredDocs[index].id, isLiked(filteredDocs[index].id));
                       },
                       child: Icon(
-                        _isLiked[index]
+                        isLiked(filteredDocs[index].id)
                             ? Icons.favorite
                             : Icons.favorite_border,
-                        color: _isLiked[index] ? Colors.red : null,
+                        color: isLiked(filteredDocs[index].id) ? Colors.red : null,
                         size: 32,
                       ),
                     ),
