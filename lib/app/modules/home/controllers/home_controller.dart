@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
-// import '../../../data/Kritik.dart';
-
 class HomeController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -10,6 +8,11 @@ class HomeController extends GetxController {
     CollectionReference kritik = firestore.collection("kritik");
 
     return kritik.orderBy('createdAt', descending: true).get();
+  }
+
+  Stream<QuerySnapshot<Object?>> streamData2() {
+    CollectionReference kritik = firestore.collection("kritik");
+    return kritik.orderBy('like', descending: true).snapshots();
   }
 
   Stream<QuerySnapshot<Object?>> streamData({bool isDescending = true}) {
@@ -42,15 +45,4 @@ class HomeController extends GetxController {
       );
     }
   }
-
-  // Future<bool> toggleLike(Kritik kritik) async {
-  //   DocumentReference docRef = firestore.collection('kritik').doc(kritik.id);
-  //   try {
-  //     await docRef.update({'isLiked': !kritik.isLiked});
-  //     return true;
-  //   } catch (e) {
-  //     print(e);
-  //     return false;
-  //   }
-  // }
 }

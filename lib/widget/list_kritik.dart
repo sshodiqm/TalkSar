@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:talk_s_a_r/res/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,27 +20,30 @@ class ListKritik extends StatefulWidget {
 }
 
 class _ListKritikState extends State<ListKritik> {
-  List<bool> _isLiked = [];
-
-  // Future<void> _toggleLike(Kritik kritik) async {
-  //   await HomeController().toggleLike(kritik);
-  // }
+  // List<bool> _isLiked = [];
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  // Harus pakai Map bukan List
+  final Map<String, bool> _isLiked = new Map();
 
   @override
   void initState() {
     super.initState();
     for (var i = 0; i < widget.listAllDocs.length; i++) {
-      _isLiked.add(false);
-      _restoreLikeStatus(i);
+      final docId = widget.listAllDocs[i].id;
+      _isLiked[docId] = false;
+      _restoreLikeStatus(docId);
     }
   }
 
-  void _restoreLikeStatus(int index) async {
+  void _restoreLikeStatus(String id) async {
     final prefs = await SharedPreferences.getInstance();
-    final isLiked = prefs.getBool('like_$index');
+    final user = await getLogedInUser();
+    String uid = user.uid;
+
+    final isLiked = prefs.getBool('like_$id\_$uid');
     if (isLiked != null) {
       setState(() {
-        _isLiked[index] = isLiked;
+        _isLiked[id] = isLiked;
       });
     }
   }
@@ -47,13 +51,25 @@ class _ListKritikState extends State<ListKritik> {
   void _updateLikeCount(int index, bool isLiked) {
     final docId = widget.listAllDocs[index].id;
     final docRef = FirebaseFirestore.instance.collection('kritik').doc(docId);
-    print(docId);
     docRef.update({'like': FieldValue.increment(isLiked ? 1 : -1)});
   }
 
-  Future<void> _saveLikeStatus(int index, bool isLiked) async {
+  Future<void> _saveLikeStatus(String id, bool isLiked) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('like_$index', isLiked);
+    final user = await getLogedInUser();
+    String uid = user.uid;
+
+    await prefs.setBool('like_$id\_$uid', isLiked);
+  }
+
+  // Apakah di like atau tidak?
+  bool isLiked(String id) {
+    final liked = _isLiked[id];
+    return liked == null ? false : liked;
+  }
+
+  Future<User> getLogedInUser() async {
+    return await auth.currentUser!;
   }
 
   @override
@@ -78,46 +94,61 @@ class _ListKritikState extends State<ListKritik> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
+              Image.network(
+                "${filteredDocs[index]["gambar"]}",
+                width: double.infinity,
+                height: 300,
+                fit: BoxFit.cover,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Image.network(
-                    "${filteredDocs[index]["gambar"]}",
-                    width: double.infinity,
-                    height: 300,
-                    fit: BoxFit.cover,
+                  Flexible(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        "${filteredDocs[index]["judul"]}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
                   ),
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isLiked[index] = !_isLiked[index];
-                        });
-                        // _toggleLike(filteredDocs[index] as Kritik);
-                        _updateLikeCount(index, _isLiked[index]);
-                        _saveLikeStatus(index, _isLiked[index]);
-                      },
-                      child: Icon(
-                        _isLiked[index]
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: _isLiked[index] ? Colors.red : null,
-                        size: 32,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Positioned(
+                      top: 16,
+                      right: 16,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isLiked[filteredDocs[index].id] = isLiked(filteredDocs[index].id) ? false : true;
+                          });
+                          _updateLikeCount(index, isLiked(filteredDocs[index].id));
+                          _saveLikeStatus(filteredDocs[index].id, isLiked(filteredDocs[index].id));
+                        },
+                        child: Column(
+                          children: [
+                            Icon(
+                              isLiked(filteredDocs[index].id)
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: isLiked(filteredDocs[index].id) ? Colors.red : null,
+                              size: 32,
+                            ),
+                            Text(
+                              "${filteredDocs[index]["like"]}",
+                              style: TextStyle(color: greySAR),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   )
                 ],
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text(
-                  "${filteredDocs[index]["judul"]}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
@@ -144,7 +175,28 @@ class _ListKritikState extends State<ListKritik> {
                   "${filteredDocs[index]["deskripsi"]}",
                   style: TextStyle(fontSize: 14),
                 ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  "Respon :",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 16, bottom: 8, right: 16),
+                child: Text(
+                  "${filteredDocs[index]["respon"]}",
+                  style: TextStyle(fontSize: 14),
+                ),
               )
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+              //   child: Text(
+              //     "${filteredDocs[index]["respon"]}",
+              //     style: TextStyle(fontSize: 14),
+              //   ),
+              // )
             ],
           ),
         ),

@@ -21,20 +21,6 @@ class HistoryController extends GetxController {
     return query.snapshots();
   }
 
-  // Stream<QuerySnapshot<Object?>> streamData(
-  //     {bool isDescending = true,
-  //     bool Function(DocumentSnapshot<Object?> doc)? filter}) {
-  //   final user = FirebaseAuth.instance.currentUser;
-  //   CollectionReference kritik = firestore.collection("kritik");
-  //   Query query = kritik.where('userId', isEqualTo: user?.uid);
-  //   if (isDescending) {
-  //     query = query.orderBy("createdAt", descending: true);
-  //   } else {
-  //     query = query.orderBy("createdAt", descending: false);
-  //   }
-  //   return query.snapshots();
-  // }
-
   void deleteKritik(String docId) {
     DocumentReference docRef = firestore.collection("kritik").doc(docId);
     try {

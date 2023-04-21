@@ -154,9 +154,23 @@ class _HomeViewState extends State<HomeView> {
                         return Center(child: CircularProgressIndicator());
                       },
                     ),
-                    Center(
-                      child: Text("Populer"),
-                    )
+                    StreamBuilder<QuerySnapshot<Object?>>(
+                      stream: Get.find<HomeController>().streamData2(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.active) {
+                          var listAllDocs = snapshot.data!.docs;
+                          return ListKritik(
+                            listAllDocs: listAllDocs,
+                            category: selectedCategory,
+                          );
+                        }
+                        return Center(child: CircularProgressIndicator());
+                      },
+                    ),
+                    // Center(
+                    //   child: Text("Populer"),
+                    // )
                   ],
                 ),
               ),
