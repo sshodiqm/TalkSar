@@ -98,7 +98,7 @@ class _SignupViewState extends State<SignupView> {
                 ),
                 //Email
                 Container(
-                  margin: EdgeInsets.only(bottom: 5),
+                  margin: const EdgeInsets.only(bottom: 5, top: 15),
                   child: Text(
                     "Email",
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),

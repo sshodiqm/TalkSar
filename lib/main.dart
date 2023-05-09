@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talk_s_a_r/app/controllers/auth_controller.dart';
 import 'package:talk_s_a_r/app/modules/profile/controllers/profile_controller.dart';
-// import 'package:talk_s_a_r/app/modules/home/views/home_view.dart';
-// import 'package:talk_s_a_r/app/modules/login/views/login_view.dart';
 
 import 'app/routes/app_pages.dart';
 import 'app/utils/loading.dart';
@@ -35,10 +33,10 @@ class MyApp extends StatelessWidget {
                       ? Routes.MAIN_SCREEN
                       : Routes.LOGIN,
               getPages: AppPages.routes,
-              // home: snapshot.data != null ? HomeView() : LoginView(),
             );
           }
           return LoadingView();
-        });
+        },
+    );
   }
 }

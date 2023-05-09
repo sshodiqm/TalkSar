@@ -18,12 +18,12 @@ class HistoryView extends GetView<HistoryController> {
           'Riwayat',
           style: TextStyle(color: Colors.black),
         ),
-        actions: [
-          IconButton(
-            onPressed: () => authC.logout(),
-            icon: Icon(Icons.logout),
-          )
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () => authC.logout(),
+        //     icon: Icon(Icons.logout),
+        //   )
+        // ],
       ),
       body: StreamBuilder<QuerySnapshot<Object?>>(
         stream: controller.streamData(isDescending: true),

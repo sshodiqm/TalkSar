@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:talk_s_a_r/res/theme.dart';
 
 import '../controllers/edit_kritik_controller.dart';
 
@@ -31,7 +32,12 @@ class _EditKritikViewState extends State<EditKritikView> {
     final controller = Get.put(EditKritikController());
     return Scaffold(
       appBar: AppBar(
-        title: Text('EDIT KRITIK'),
+        iconTheme: IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+        title: Text(
+          'Edit Kritik',
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
       ),
       body: FutureBuilder<DocumentSnapshot<Object?>>(
@@ -42,9 +48,10 @@ class _EditKritikViewState extends State<EditKritikView> {
             controller.judulC.text = data["judul"];
             controller.kategoriC.text = data["kategori"];
             controller.deskripsiC.text = data["deskripsi"];
+            var gambarUrl = data["gambar"];
             return Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
+              child: ListView(
                 children: [
                   Card(
                     child: InkWell(
@@ -57,12 +64,18 @@ class _EditKritikViewState extends State<EditKritikView> {
                                 _image!,
                                 fit: BoxFit.cover,
                               )
-                            : Center(
-                                child: Text(
-                                  "Ganti gambar",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
+                            : Image.network(
+                                gambarUrl,
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.cover,
                               ),
+                        // Center(
+                        //     child: Text(
+                        //       "Ganti gambar",
+                        //       style: TextStyle(fontWeight: FontWeight.bold),
+                        //     ),
+                        //   ),
                       ),
                     ),
                   ),
@@ -105,14 +118,28 @@ class _EditKritikViewState extends State<EditKritikView> {
                   ),
                   SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: () => controller.editKritik(
-                      controller.judulC.text,
-                      controller.kategoriC.text,
-                      controller.deskripsiC.text,
-                      _image!,
-                      Get.arguments,
-                    ),
+                    onPressed: () {
+                      // cek jika _image tidak null sebelum digunakan
+                      if (_image != null) {
+                        controller.editKritik(
+                          controller.judulC.text,
+                          controller.kategoriC.text,
+                          controller.deskripsiC.text,
+                          _image!,
+                          Get.arguments,
+                        );
+                      } else {
+                        controller.editKritik(
+                          controller.judulC.text,
+                          controller.kategoriC.text,
+                          controller.deskripsiC.text,
+                          null,
+                          Get.arguments,
+                        );
+                      }
+                    },
                     child: Text("EDIT KRITIK"),
+                    style: ElevatedButton.styleFrom(backgroundColor: blueSAR),
                   ),
                 ],
               ),

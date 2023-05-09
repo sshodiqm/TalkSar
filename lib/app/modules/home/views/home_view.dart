@@ -54,12 +54,12 @@ class _HomeViewState extends State<HomeView> {
               'assets/img/logo.png',
               width: 100,
             ),
-            actions: [
-              IconButton(
-                onPressed: () => authC.logout(),
-                icon: Icon(Icons.logout),
-              )
-            ],
+            // actions: [
+            //   IconButton(
+            //     onPressed: () => authC.logout(),
+            //     icon: Icon(Icons.logout),
+            //   )
+            // ],
             bottom: TabBar(
               labelColor: greenSAR,
               unselectedLabelColor: greySAR,

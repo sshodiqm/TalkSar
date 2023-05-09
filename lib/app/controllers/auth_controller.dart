@@ -1,12 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:talk_s_a_r/app/routes/app_pages.dart';
 
+import '../modules/profile/controllers/profile_controller.dart';
+
 class AuthController extends GetxController {
   FirebaseAuth auth = FirebaseAuth.instance;
+  final Rx<User?> _user = Rx<User?>(null);
 
   Stream<User?> get streamAuthStatus => auth.authStateChanges();
+
+  @override
+  void onInit() {
+    super.onInit();
+    auth.authStateChanges().listen((User? user) {
+      _user.value = user;
+      if (user != null) {
+        Get.find<ProfileController>().onInit();
+      } else {
+        Get.find<ProfileController>().username = "";
+        Get.find<ProfileController>().email = "";
+        Get.find<ProfileController>().password = "";
+        Get.find<ProfileController>().update();
+      }
+    });
+  }
 
   void resetPassword(String email) async {
     if (email != "" && GetUtils.isEmail(email)) {
@@ -16,7 +36,7 @@ class AuthController extends GetxController {
           title: "Berhasil",
           middleText: "Kami telah mengirimkan reset password ke email $email.",
           onConfirm: () {
-            Get.back(); // Close dialoh
+            Get.back(); // Close dialog
             Get.back(); // Move to login
           },
           textConfirm: "Ya, Saya mengerti",
@@ -78,7 +98,8 @@ class AuthController extends GetxController {
     }
   }
 
-  void signup(String email, String password, String confirm, String username) async {
+  void signup(
+      String email, String password, String confirm, String username) async {
     if (password != confirm) {
       Get.defaultDialog(
         title: "Terjadi Kesalahan",
@@ -134,8 +155,28 @@ class AuthController extends GetxController {
     }
   }
 
-  void logout() async {
-    await FirebaseAuth.instance.signOut();
-    Get.offAllNamed(Routes.LOGIN);
+  // void logout() async {
+  //   await FirebaseAuth.instance.signOut();
+  //   Get.offAllNamed(Routes.LOGIN);
+  // }
+
+  void logout() {
+    Get.defaultDialog(
+      title: "Konfirmasi",
+      middleText: "Anda yakin ingin keluar?",
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            logout();
+            Get.offAllNamed(Routes.LOGIN); // Close dialog
+          },
+          child: Text("Ya"),
+        ),
+        ElevatedButton(
+          onPressed: () => Get.back(), // Close dialog
+          child: Text("Tidak"),
+        ),
+      ],
+    );
   }
 }
